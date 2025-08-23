@@ -42,7 +42,7 @@ __repo__ = "https://github.com/adafruit/Adafruit_CircuitPython_USB_Host_Mouse.gi
 BUTTONS = ["left", "right", "middle"]
 
 
-def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
+def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp", debug=True):
     """
     Scan for an attached boot mouse connected via USB host.
     If one is found initialize an instance of BootMouse class
@@ -53,14 +53,17 @@ def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
     mouse_device = None
 
     # scan for connected USB device and loop over any found
-    print("scanning usb")
+    if debug:
+        print("scanning usb")
     for device in usb.core.find(find_all=True):
-        # print device info
-        print(f"{device.idVendor:04x}:{device.idProduct:04x}")
-        print(device.manufacturer, device.product)
-        print()
+        if debug:
+            # print device info
+            print(f"{device.idVendor:04x}:{device.idProduct:04x}")
+            print(device.manufacturer, device.product)
+            print()
         config_descriptor = adafruit_usb_host_descriptors.get_configuration_descriptor(device, 0)
-        print(config_descriptor)
+        if debug:
+            print(config_descriptor)
 
         _possible_interface_index, _possible_endpoint_address = (
             adafruit_usb_host_descriptors.find_boot_mouse_endpoint(device)
@@ -69,10 +72,11 @@ def find_and_init_boot_mouse(cursor_image="/launcher_assets/mouse_cursor.bmp"):
             mouse_device = device
             mouse_interface_index = _possible_interface_index
             mouse_endpoint_address = _possible_endpoint_address
-            print(
-                f"mouse interface: {mouse_interface_index} "
-                + f"endpoint_address: {hex(mouse_endpoint_address)}"
-            )
+            if debug:
+                print(
+                    f"mouse interface: {mouse_interface_index} "
+                    + f"endpoint_address: {hex(mouse_endpoint_address)}"
+                )
 
     mouse_was_attached = None
     if mouse_device is not None:
